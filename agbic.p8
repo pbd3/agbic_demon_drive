@@ -10,6 +10,8 @@ function _init()
  steer_angle=.25
  angle=.25
  max_speed=1.5
+ lap=1
+ boost=2
  angels={}
  for i=1,1 do
   _angel_x=flr(rnd(127))
@@ -53,18 +55,18 @@ function turn_car()
 end
 
 
-function solid(_x,_y)
+function solid(_x,_y,_sflag)
  val=mget(_x/8,_y/8)
- return fget(val, 3) 
+ return fget(val, _sflag) 
 end
 
 
-function solid_area(_x,_y,_w,_h)
+function solid_area(_x,_y,_w,_h,_sflag)
  return 
-  solid(_x-_w,_y-_h) or
-  solid(_x+_w,_y-_h) or
-  solid(_x-_w,_y+_h) or
-  solid(_x+_w,_y+_h)
+  solid(_x-_w,_y-_h,_sflag) or
+  solid(_x+_w,_y-_h,_sflag) or
+  solid(_x-_w,_y+_h,_sflag) or
+  solid(_x+_w,_y+_h,_sflag)
 end
 
 
@@ -79,17 +81,21 @@ function move_car()
  end
  vx=vx*(1-fric)
  vy=vy*(1-fric)
- if not solid(x+vx,y,4,4) then
+ if solid_area(x+vx,y+vy,2,2,0) then
+  vx*=boost
+  vy*=boost
+ end
+ if not solid_area(x+vx,y,2,2,3) then
   x+=vx
  else
   vx*=-.001
  end
- if not solid(x,y+vy,4,4) then
+ if not solid_area(x,y+vy,2,2,3) then
  	y+=vy
  else 
   vy*=-.001
  end
- angle=atan2(vx,vy)
+ //angle=atan2(vx,vy)
  
 end
 
